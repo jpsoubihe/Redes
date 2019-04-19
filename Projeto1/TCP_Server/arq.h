@@ -36,3 +36,5 @@ void add_xp(FileInfo *f,char *s);// ADDS an experience to a profile
 char* print_all(FileInfo *f);//SAVES all the profile in a string
 
 int conta_xp(FileInfo *f); //COUNTS the number of experiences the profile already has
+
+void getNome(FileInfo *f,char *s);

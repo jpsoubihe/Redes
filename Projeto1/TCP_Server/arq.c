@@ -229,7 +229,6 @@ void add_xp(FileInfo *f,char *s){
     char s_p[1000];
     char aux[1000];
     memset(s_p,0,1000);
-  //  s_p = malloc((4 + strlen(s)) * sizeof(char));
 
     s_p[0] = '(';
     s_p[1] = conta_xp(f) + '0';
@@ -242,6 +241,7 @@ void add_xp(FileInfo *f,char *s){
     printf("s_p = %s\n", s_p);
 
     a = fopen(f->filename, "a+");
+    
     if (a == NULL){
       perror("fopen");
       exit(1);
@@ -275,4 +275,25 @@ char* print_all(FileInfo *f){
   fread(aux,tam,1,a);
 
   return aux;
+}
+
+void getNome(FileInfo *f,char *s){
+  FILE *a;
+  char aux[1000];
+
+  a = fopen(f->filename, "r");
+  if (a == NULL){
+    perror("fopen");
+    exit(1);
+  }
+
+  fgets(aux,1000,a);
+  fseek(a,6,SEEK_CUR);
+  fscanf(a,"%s",aux);
+  strcpy(s,aux);
+  fscanf(a,"%s",aux);
+  fscanf(a," %s",aux);
+  strcat(s," ");
+  strcat(s,aux);
+  printf("s = %s\n", s);
 }
