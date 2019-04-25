@@ -14,7 +14,7 @@
 
 
 #define SERVERPORT "4950" // the port users will be connecting to
-#define MAXBUFLEN 100
+#define MAXBUFLEN 100000
 
 int main(int argc, char *argv[]){
 	int sockfd;
@@ -23,18 +23,21 @@ int main(int argc, char *argv[]){
 	int numbytes;
 	struct sockaddr_storage their_addr;
 	char buf[MAXBUFLEN];
+	char nome[MAXBUFLEN];
+	FILE *arq;
+	FILE *arqI;
 	socklen_t addr_len;
 
-	
+
 	if (argc != 3) {
 		fprintf(stderr,"usage: talker hostname message\n");
 		exit(1);
 	}
-	
+
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
-	
+
 	if ((rv = getaddrinfo(argv[1], SERVERPORT, &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
@@ -49,18 +52,21 @@ int main(int argc, char *argv[]){
 		}
 		break;
 	}
-	
+
 	if (p == NULL) {
 		fprintf(stderr, "talker: failed to create socket\n");
 		return 2;
 	}
-	
+
+	strcpy(nome,argv[2]);
+	printf("nome = %s\n", nome);
+
 	if ((numbytes = sendto(sockfd, argv[2], strlen(argv[2]), 0,
 		p->ai_addr, p->ai_addrlen)) == -1) {
 		perror("talker: sendto");
 		exit(1);
 	}
-	
+
 	printf("talker: sent %d bytes to %s\n", numbytes, argv[1]);
 
 	printf("talker: waiting to recvfrom...\n");
@@ -72,7 +78,7 @@ int main(int argc, char *argv[]){
 	}
 
 	buf[numbytes] = '\0';
-	
+
 	if(strcmp(buf,"Wrong") == 0){
 		close(sockfd);
 		printf("Erro\n");
@@ -87,11 +93,32 @@ int main(int argc, char *argv[]){
 	}
 
 	buf[numbytes] = '\0';
-	printf("%s\n", buf);
+
+
+	strcat(nome,".txt");
+	arq = fopen(nome,"w"); //WRITES a file to save the answer from the server
+	buf[numbytes] = '\0';
+	fprintf(arq,"%s",buf);
+	fclose(arq);
+	printf("%s",buf); // PRINTS in the client screen
+	memset(buf,0,strlen(buf));
+
+	if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
+		perror("recvfrom");
+		exit(1);
+	}
+
+	strcat(nome,".jpeg");
+	arqI = fopen(nome,"w"); //WRITES a file to save the image sent from the server
+	buf[numbytes] = '\0';
+	fprintf(arqI,"%s",buf);
+	fclose(arqI);
+	printf("tamanho do arquivo de imagem = %d\n", strlen(buf));
+	printf("%s",buf); // PRINTS in the client screen
+	memset(buf,0,strlen(buf));
+
 	freeaddrinfo(servinfo);
-	
-	
-	
+
 	close(sockfd);
 	return 0;
 }

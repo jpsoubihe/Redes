@@ -1,6 +1,7 @@
 /*
 ** server.c -- a stream socket server demo
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -140,9 +141,9 @@ int main(void){
       printf("server: got connection from %s\n", s);
 
       if (!fork()) { // this is the child process
-        
+
         close(sockfd); // child doesn't need the listener
-        
+
         if (send(new_fd, frase1, strlen(frase1), 0) == -1) // SEND welcome message
           perror("send");
 
@@ -156,23 +157,23 @@ int main(void){
         printf("login de %s\n", buf);
 
         int flag = -1;
-        
+
         for (i = 0; i < sizeof(file_array) / sizeof(FileInfo); i += 2){ //CHECKS Login
           if(compare(file_array[i].filename,buf) == 1){
           	f_info = &file_array[i];
           	flag = i;
-          }     
+          }
         }
-		
+
 		if(flag == -1){//Case wrong login
         	strcpy(buf,"Wrong");
-    
+
 	        if (sendall(new_fd, f,&len) == -1)// SENDS menu
 	        	perror("send");
 
    		exit(1);
    		close(sockfd);
-    	} 
+    	}
 
         char *login;
         login = malloc(strlen(buf)*sizeof(char));
@@ -209,12 +210,12 @@ int main(void){
 		       else if(inteiro == 1){ // List all people of a specific academic formation
 	             getNome(f_info,nome);
 	             len = strlen(nome);
-	             
+
 	             printf("nome = %s\nlen = %d", nome, len);
-	             
+
 	             if (sendall(new_fd,nome,&len) == -1) // SENDS menu
           			perror("send");
-	             
+
 	             memset(nome,0,len);
 	                   //FALTA IMAGEM!!!!!!!!!!!!!!!!!
 

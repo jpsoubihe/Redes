@@ -1,6 +1,10 @@
 /*
 ** listener.c -- a datagram sockets "server" demo
 */
+
+/*Pensar no caso do cliente mandar a requisição, o servidor receber, mas a resposta se perder no caminho ao cliente
+Primitiva select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,struct timeval *timeout); - tem no beej*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -16,7 +20,7 @@
 #define MYPORT "4950"
 
 // the port users will be connecting to
-#define MAXBUFLEN 100
+#define MAXBUFLEN 100000
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa){
@@ -34,8 +38,9 @@ int main(void){
 	int numbytes;
 	struct sockaddr_storage their_addr;
 	char buf[MAXBUFLEN];
-	int addr_len;
+	int addr_len,tam_img;
 	char s[INET6_ADDRSTRLEN];
+	char img[MAXBUFLEN];
 	FILE *a;
 	int i;
     FileInfo *f_info;
@@ -58,7 +63,7 @@ int main(void){
 	hints.ai_family = AF_UNSPEC; // set to AF_INET to force IPv4
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags = AI_PASSIVE; // use my IP
-	
+
 	if ((rv = getaddrinfo(NULL, MYPORT, &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
@@ -84,65 +89,85 @@ int main(void){
 	}
 
 	freeaddrinfo(servinfo);
-	
-	printf("listener: waiting to recvfrom...\n");
-	addr_len = sizeof their_addr;
-	
-	if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
-		perror("recvfrom");
-		exit(1);
-	}
-	
-	printf("listener: got packet from %s\n",
-	inet_ntop(their_addr.ss_family,get_in_addr((struct sockaddr *)&their_addr),s, sizeof s));
-	
-	printf("listener: packet is %d bytes long\n", numbytes);
-	
-	buf[numbytes] = '\0';
-	printf("listener: packet contains \"%s\"\n", buf);
+	while(1){
+		printf("listener: waiting to recvfrom...\n");
+		addr_len = sizeof their_addr;
 
-	strcat(buf,".txt");
-    buf[numbytes + 4] = '\0';
-   	printf("login de %s\n", buf);
+		if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
+			perror("recvfrom");
+			exit(1);
+		}
 
-    int flag = -1;
-    for (i = 0; i < sizeof(file_array) / sizeof(FileInfo); i += 2){ //CHECKS Login
-    	if(compare(file_array[i].filename,buf) == 1){
-    		f_info = &file_array[i];
-    		flag = i;
-    	}
-    }
+		printf("listener: got packet from %s\n",
+		inet_ntop(their_addr.ss_family,get_in_addr((struct sockaddr *)&their_addr),s, sizeof s));
 
-    if(flag == -1){//Case wrong login
-        strcpy(buf,"Wrong");
-    
-        if ((numbytes = sendto(sockfd, buf, strlen(buf), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
+		printf("listener: packet is %d bytes long\n", numbytes);
+
+		buf[numbytes] = '\0';
+		printf("listener: packet contains \"%s\"\n", buf);
+
+		strcat(buf,".txt");
+	  buf[numbytes + 4] = '\0';
+	  printf("login de %s\n", buf);
+
+	  int flag = -1;
+	  for (i = 0; i < sizeof(file_array) / sizeof(FileInfo); i += 2){ //CHECKS Login
+	  	if(compare(file_array[i].filename,buf) == 1){
+	  		f_info = &file_array[i];
+	  		flag = i;
+	  	}
+	  }
+
+	  if(flag == -1){//Case wrong login
+			strcpy(buf,"Wrong");
+
+			if ((numbytes = sendto(sockfd, buf, strlen(buf), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
+				perror("listener: sendto");
+				exit(1);
+			}
+
+			exit(1);
+	   	free(f_info);
+	   	close(sockfd);
+		}
+
+		strcpy(buf,"Bem Vindo!!");
+
+
+		if ((numbytes = sendto(sockfd, buf, strlen(buf), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
 			perror("listener: sendto");
 			exit(1);
 		}
-   	exit(1);
-   	free(f_info);
-   	close(sockfd);
-    } 
-          
-	strcpy(buf,"Bem Vindo!!");
 
+		printf("listener: sent %d bytes to client\n", numbytes);
 
-	if ((numbytes = sendto(sockfd, buf, strlen(buf), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
-		perror("listener: sendto");
-		exit(1);
+		getNome(f_info,buf);
+
+		if ((numbytes = sendto(sockfd, buf, strlen(buf), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
+			perror("listener: sendto");
+			exit(1);
+		}
+
+			//FALTA IMPLEMENTAR SEND DA IMAGEM!!!!!!!!!!!!!!!!!!!!!
+		f_info = &file_array[flag + 1];
+		tam_img = file_size(f_info);
+		read_image(f_info,img,tam_img);
+		printf("tam string = %d\n", strlen(img));
+		int i = 0;
+		while(img[i] != '\0')
+			i++;
+		printf("i = %d\n", i);
+		printf("%s\n", img);
+		printf("tam file = %d\n", tam_img);
+
+		if ((numbytes = sendto(sockfd, img, strlen(img), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
+			perror("listener: sendto");
+			exit(1);
+		}
 	}
 
-	printf("listener: sent %d bytes to client\n", numbytes);
-	
-	getNome(f_info,buf);
 
-	if ((numbytes = sendto(sockfd, buf, strlen(buf), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
-		perror("listener: sendto");
-		exit(1);
-	}
 
-	//FALTA IMPLEMENTAR SEND DA IMAGEM!!!!!!!!!!!!!!!!!!!!!
 
 	close(sockfd);
 	return 0;

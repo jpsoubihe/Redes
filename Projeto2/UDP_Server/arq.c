@@ -7,12 +7,16 @@ typedef struct FileInfo {
   FILE *fp;
 } FileInfo;
 
-void read_image(FileInfo *f,unsigned char *s,int len){
+int file_size(FileInfo *f){
   FILE *a;
-  a = fopen(f->filename, "rb");
-  fread(s,len,1,a);
-  rewind(a);
+  int len;
+
+  a = fopen(f->filename, "r");
+  fseek(a,0,SEEK_END);
+  len = ftell(a);
+  fseek(a,0,SEEK_SET);
   fclose(a);
+  return len;
 }
 
 int fileb_size(FileInfo *f){
@@ -27,17 +31,14 @@ int fileb_size(FileInfo *f){
   return len;
 }
 
-int file_size(FileInfo *f){
+void read_image(FileInfo *f,char *s,int len){
   FILE *a;
-  int len;
-
-  a = fopen(f->filename, "r");
-  fseek(a,0,SEEK_END);
-  len = ftell(a);
-  fseek(a,0,SEEK_SET);
+  a = fopen(f->filename, "rb");
+  fread(s,fileb_size(f),1,a);
+  rewind(a);
   fclose(a);
-  return len;
 }
+
 
 int compare(char *st1,char *st2){
   for(int i = 2;i < strlen(st1);i++){
@@ -241,7 +242,7 @@ void add_xp(FileInfo *f,char *s){
     printf("s_p = %s\n", s_p);
 
     a = fopen(f->filename, "a+");
-    
+
     if (a == NULL){
       perror("fopen");
       exit(1);
