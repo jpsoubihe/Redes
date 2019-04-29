@@ -150,17 +150,32 @@ int main(void){
 
 			//FALTA IMPLEMENTAR SEND DA IMAGEM!!!!!!!!!!!!!!!!!!!!!
 		f_info = &file_array[flag + 1];
-		tam_img = file_size(f_info);
-		read_image(f_info,img,tam_img);
-		printf("tam string = %d\n", strlen(img));
-		int i = 0;
-		while(img[i] != '\0')
-			i++;
-		printf("i = %d\n", i);
-		printf("%s\n", img);
-		printf("tam file = %d\n", tam_img);
+		tam_img = fileb_size(f_info);
 
-		if ((numbytes = sendto(sockfd, img, strlen(img), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
+
+		sprintf(buf,"%d",tam_img);
+
+		
+		if ((numbytes = sendto(sockfd, buf,tam_img, 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
+			perror("listener: sendto");
+			exit(1);
+		}
+
+		a = fopen(f_info->filename,"rb");
+		int i = 0;
+		while(i < tam_img){
+			buf[i] = fgetc(a);
+			i++;
+		}
+		
+
+
+		printf("tamanho da imagem = %d\n", i);
+		printf("tamanho da imagem = %ld\n", strlen(buf));
+
+
+
+		if ((numbytes = sendto(sockfd, buf,tam_img, 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
 			perror("listener: sendto");
 			exit(1);
 		}
