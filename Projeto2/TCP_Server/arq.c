@@ -280,7 +280,6 @@ char* print_all(FileInfo *f){
 void getNome(FileInfo *f,char *s){
   FILE *a;
   char aux[1000];
-  printf("entrou\n");
   a = fopen(f->filename, "r");
   if (a == NULL){
     perror("fopen");
@@ -295,5 +294,4 @@ void getNome(FileInfo *f,char *s){
   fscanf(a," %s",aux);
   strcat(s," ");
   strcat(s,aux);
-  printf("s = %s\n", s);
 }

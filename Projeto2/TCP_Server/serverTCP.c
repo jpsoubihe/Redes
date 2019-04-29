@@ -68,6 +68,8 @@ int main(void){
     char frase1[] = "Bem-vindo!\nLogin:";
     int len,i,j;
     char nome[100];
+    int tam_img;
+    char img[MAXDATASIZE];
     char *f;
     FILE *a;
     FileInfo *f_info;
@@ -211,13 +213,24 @@ int main(void){
 	             getNome(f_info,nome);
 	             len = strlen(nome);
 
-	             printf("nome = %s\nlen = %d", nome, len);
-
 	             if (sendall(new_fd,nome,&len) == -1) // SENDS menu
           			perror("send");
 
 	             memset(nome,0,len);
 	                   //FALTA IMAGEM!!!!!!!!!!!!!!!!!
+
+	             f_info = &file_array[flag + 1]; //f_info aponta para a imagem respectiva ao perfil
+               	 tam_img = fileb_size(f_info); //tamanho real do arquivo jpeg
+
+               	 sprintf(img,"%d",tam_img); //guarda em buf uma string com o tamanho da imagem
+
+               	 printf("tamanho imagem = %d\n", tam_img);
+
+               	 if (send(new_fd, buf, strlen(buf), 0) == -1) // SEND welcome message
+                	perror("send");
+
+               	 f_info = &file_array[flag];
+
 
 	           }
 		       else{
