@@ -19,7 +19,7 @@
 
 #define PORT "3490"  // the port users will be connecting to
 #define BACKLOG 10   // how many pending connections queue will hold
-#define MAXDATASIZE 10000 // max number of bytes we can get at once
+#define MAXDATASIZE 100000 // max number of bytes we can get at once
 
 struct timeval tv1,tv2;
 
@@ -220,20 +220,33 @@ int main(void){
 	                   //FALTA IMAGEM!!!!!!!!!!!!!!!!!
 
 	             f_info = &file_array[flag + 1]; //f_info aponta para a imagem respectiva ao perfil
-               	 tam_img = fileb_size(f_info); //tamanho real do arquivo jpeg
+               tam_img = fileb_size(f_info); //tamanho real do arquivo jpeg
 
-               	 sprintf(img,"%d",tam_img); //guarda em buf uma string com o tamanho da imagem
+               sprintf(img,"%d",tam_img); //guarda em buf uma string com o tamanho da imagem
 
-               	 printf("tamanho imagem = %d\n", tam_img);
+            	 printf("tamanho imagem = %s\n", img);
 
-               	 if (send(new_fd, buf, strlen(buf), 0) == -1) // SEND welcome message
-                	perror("send");
-
-               	 f_info = &file_array[flag];
+             	 if (send(new_fd, img, strlen(img), 0) == -1) // SEND size of image
+              	perror("send");
 
 
+               memset(buf,0,strlen(buf));
+               a = fopen(f_info->filename,"rb");
+            	 int i = 0;
+            	 while(i < tam_img){
+                 buf[i] = fgetc(a);
+                 i++;
+            	}
+
+              fclose(a);
+
+              if (send(new_fd, buf, i, 0) == -1) // SEND image
+               perror("send");
+
+              f_info = &file_array[flag];
 	           }
-		       else{
+
+		         else{
 	             close(new_fd);
 	             exit(0);
 	           }

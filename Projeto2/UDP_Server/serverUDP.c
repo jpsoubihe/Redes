@@ -1,7 +1,8 @@
 /*
 ** listener.c -- a datagram sockets "server" demo
 */
-
+// CHECAR ESSE SITE https://devarea.com/linux-io-multiplexing-select-vs-poll-vs-epoll/#.XMr94sZ7mV4
+// Arrumar select();
 /*Pensar no caso do cliente mandar a requisição, o servidor receber, mas a resposta se perder no caminho ao cliente
 Primitiva select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,struct timeval *timeout); - tem no beej*/
 
@@ -15,6 +16,7 @@ Primitiva select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,str
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <sys/select.h>
 #include "arq.h"
 
 #define MYPORT "4950"
@@ -42,6 +44,7 @@ int main(void){
 	char s[INET6_ADDRSTRLEN];
 	char img[MAXBUFLEN];
 	FILE *a;
+	fd_set rset;
 	int i;
     FileInfo *f_info;
     FileInfo file_array[] = {
@@ -90,6 +93,8 @@ int main(void){
 
 	freeaddrinfo(servinfo);
 	while(1){
+		FD_ZERO(&rset);
+		FD_SET(sockfd,&rset);
 		printf("listener: waiting to recvfrom...\n");
 		addr_len = sizeof their_addr;
 
@@ -155,8 +160,8 @@ int main(void){
 
 		sprintf(buf,"%d",tam_img);
 
-		
-		if ((numbytes = sendto(sockfd, buf,tam_img, 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
+
+		if ((numbytes = sendto(sockfd, buf,tam_img, 0,(struct sockaddr *)&their_addr,addr_len)) == -1) { //SENDS size of image
 			perror("listener: sendto");
 			exit(1);
 		}
@@ -167,7 +172,7 @@ int main(void){
 			buf[i] = fgetc(a);
 			i++;
 		}
-		
+
 
 
 		printf("tamanho da imagem = %d\n", i);

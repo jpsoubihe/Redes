@@ -13,7 +13,7 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #define PORT "3490" // the port client will be connecting to
-#define MAXDATASIZE 10000 // max number of bytes we can get at once
+#define MAXDATASIZE 100000 // max number of bytes we can get at once
 // get sockaddr, IPv4 or IPv6:
 
 struct timeval tv1,tv2;
@@ -33,9 +33,12 @@ int main(int argc, char *argv[]){
   char s[INET6_ADDRSTRLEN];
   char nome[50];
   char nome_aux[50];
+  char nome_img[50];
   char senha[12];
-  int len;
+  int len,i;
   FILE *arq;
+  FILE *arqI;
+
 
 
 
@@ -63,7 +66,8 @@ int main(int argc, char *argv[]){
       perror("client: connect");
       continue;
     }
-    break;
+    break;  char nome_aux[50];
+
   }
 
   if (p == NULL) {
@@ -84,6 +88,8 @@ int main(int argc, char *argv[]){
   printf("%s\n",buf);
 
   scanf("%s", nome);
+  strcpy(nome_img,nome);
+  strcat(nome_img,".jpeg");
 
   if (send(sockfd,nome,strlen(nome), 0) == -1) //SENDS username
     perror("send");
@@ -108,7 +114,7 @@ int main(int argc, char *argv[]){
     converted_number = htonl(op); //PREPARES the integer to be sent through the socket
     write(sockfd, &converted_number, sizeof(converted_number)); //SENDS the operation integer to the server
     gettimeofday(&tv1,NULL); //captures the initial time of the requisition
-    
+
     if(op == 0){ //SHUT DOWN the connection
       loop--;
       close(sockfd);
@@ -132,14 +138,14 @@ int main(int argc, char *argv[]){
       buf[numbytes] = '\0';
       fprintf(arq,"%s",buf);
       fclose(arq);
-      printf("%s",buf); // PRINTS in the client screen
+      printf("%s\n",buf); // PRINTS in the client screen
       memset(buf,0,strlen(buf));
       memset(nome_aux,0,strlen(nome_aux));
 
 
       //FALTA IMAGEM!!!!!!!!!!!!!!!!!
 
-      if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) { //RECEIVES data
+      if ((numbytes = recv(sockfd, buf, 10, 0)) == -1) { //RECEIVES data
         perror("recv");
         exit(1);
       }
@@ -147,8 +153,28 @@ int main(int argc, char *argv[]){
       buf[numbytes] = '\0';
       int num = atoi(buf);
       printf("num = %d\n", num);
+      memset(buf,0,num);
+
+      if ((numbytes = recv(sockfd, buf, num, 0)) == -1) { //RECEIVES image
+        perror("recv");
+        exit(1);
+      }
+
+      i = 0;
+
+    	arqI = fopen(nome_img,"wb"); //WRITES a file to save the image sent from the server
+    	buf[numbytes] = '\0';
+
+    	while(i < num){
+    		fprintf(arqI,"%c",buf[i]);
+    		i++;
+    	}
+      printf("tamanho da imagem = %d\n", i);
+
+    	fclose(arqI);
+
     }
-    printf("\n");
+
     double tempo = (tv2.tv_sec - tv1.tv_sec) + ((tv2.tv_usec - tv1.tv_usec)/1000000.0);
     printf("Tempo de consulta: %lf\n", tempo);
   }
