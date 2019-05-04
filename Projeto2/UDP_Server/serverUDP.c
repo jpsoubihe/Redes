@@ -16,7 +16,6 @@ Primitiva select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,str
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <sys/select.h>
 #include "arq.h"
 
 #define MYPORT "4950"

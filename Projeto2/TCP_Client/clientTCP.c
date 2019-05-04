@@ -162,16 +162,18 @@ int main(int argc, char *argv[]){
 
       i = 0;
 
-    	arqI = fopen(nome_img,"wb"); //WRITES a file to save the image sent from the server
-    	buf[numbytes] = '\0';
+    	arqI = fopen(nome_img,"w+"); //WRITES a file to save the image sent from the server
+    	//buf[numbytes] = '\0';
 
     	while(i < num){
     		fprintf(arqI,"%c",buf[i]);
     		i++;
     	}
       printf("tamanho da imagem = %d\n", i);
-
+      rewind(arqI);
     	fclose(arqI);
+
+      memset(buf,0,i);
 
     }
 

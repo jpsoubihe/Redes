@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <sys/select.h>
 
 
 #define SERVERPORT "4950" // the port users will be connecting to
@@ -31,16 +32,19 @@ int fileb_size(FILE *a,char *nome){
 int main(int argc, char *argv[]){
 	int sockfd;
 	struct addrinfo hints, *servinfo, *p;
-	int rv;
+	int rv,n;
 	int numbytes;
 	struct sockaddr_storage their_addr;
 	char buf[MAXBUFLEN];
 	char nome[MAXBUFLEN];
 	char nome_img[MAXBUFLEN];
+	fd_set readfds;
+	struct timeval tv;
 	FILE *arq;
 	FILE *arqI;
 	socklen_t addr_len;
 
+	FD_ZERO(&readfds);
 
 	if (argc != 3) {
 		fprintf(stderr,"usage: talker hostname message\n");
@@ -63,8 +67,14 @@ int main(int argc, char *argv[]){
 			perror("talker: socket");
 			continue;
 		}
+		FD_SET(sockfd, &readfds);
 		break;
 	}
+
+	n = sockfd + 1;
+	tv.tv_sec = 10;
+	tv.tv_usec = 500000;
+
 
 	if (p == NULL) {
 		fprintf(stderr, "talker: failed to create socket\n");
@@ -74,8 +84,7 @@ int main(int argc, char *argv[]){
 	strcpy(nome,argv[2]);
 	printf("nome = %s\n", nome);
 
-	if ((numbytes = sendto(sockfd, argv[2], strlen(argv[2]), 0,
-		p->ai_addr, p->ai_addrlen)) == -1) {
+	if ((numbytes = sendto(sockfd, argv[2], strlen(argv[2]), 0,p->ai_addr, p->ai_addrlen)) == -1) {
 		perror("talker: sendto");
 		exit(1);
 	}
@@ -83,11 +92,24 @@ int main(int argc, char *argv[]){
 	printf("talker: sent %d bytes to %s\n", numbytes, argv[1]);
 
 	printf("talker: waiting to recvfrom...\n");
+
 	addr_len = sizeof their_addr;
 
-	if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
-		perror("recvfrom");
-		exit(1);
+	rv = select(n, &readfds, NULL, NULL, &tv);
+
+	if (rv == -1) {
+		perror("select"); // error occurred in select()
+	} 
+	else if (rv == 0) {
+		printf("Timeout occurred! No data after 10.5 seconds.\n");
+	} 
+	else{
+		if (FD_ISSET(sockfd, &readfds)){
+			if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
+				perror("recvfrom");
+				exit(1);
+				}
+		}
 	}
 
 	buf[numbytes] = '\0';
@@ -100,10 +122,25 @@ int main(int argc, char *argv[]){
 	else
 		printf("%s\n", buf);
 
-	if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
-		perror("recvfrom");
-		exit(1);
+	rv = select(n, &readfds, NULL, NULL, &tv);
+
+	if (rv == -1) {
+		perror("select"); // error occurred in select()
+	} 
+	else if (rv == 0) {
+		printf("Timeout occurred! No data after 10.5 seconds.\n");
+	} 
+	else{
+		if (FD_ISSET(sockfd, &readfds)){
+			if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
+				perror("recvfrom");
+				exit(1);
+			}
+		}
 	}
+
+
+	
 
 	buf[numbytes] = '\0';
 	strcpy(nome_img,nome);
@@ -129,13 +166,27 @@ int main(int argc, char *argv[]){
 
 	memset(buf,0,strlen(buf));
 
-	if ((numbytes = recvfrom(sockfd, buf,num , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
-		perror("recvfrom");
-		exit(1);
-	}
-	int i = 0;
-	char str[MAXBUFLEN];
+	rv = select(n, &readfds, NULL, NULL, &tv);
 
+	if (rv == -1) {
+		perror("select"); // error occurred in select()
+	} 
+	else if (rv == 0) {
+		printf("Timeout occurred! No data after 10.5 seconds.\n");
+	} 
+	else{
+		if (FD_ISSET(sockfd, &readfds)){
+			if ((numbytes = recvfrom(sockfd, buf,num , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
+				perror("recvfrom");
+				exit(1);
+			}
+		}
+	}
+
+
+	
+	int i = 0;
+		
 	strcat(nome_img,".jpeg");
 	arqI = fopen(nome_img,"wb"); //WRITES a file to save the image sent from the server
 	//buf[numbytes] = '\0';

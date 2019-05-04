@@ -238,10 +238,13 @@ int main(void){
                  i++;
             	}
 
+              rewind(a);
               fclose(a);
 
               if (send(new_fd, buf, i, 0) == -1) // SEND image
                perror("send");
+
+           	  memset(buf,0,i);
 
               f_info = &file_array[flag];
 	           }
