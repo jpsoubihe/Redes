@@ -82,8 +82,7 @@ int main(int argc, char *argv[]){
 	}
 
 	strcpy(nome,argv[2]);
-	printf("nome = %s\n", nome);
-
+  
 	if ((numbytes = sendto(sockfd, argv[2], strlen(argv[2]), 0,p->ai_addr, p->ai_addrlen)) == -1) {
 		perror("talker: sendto");
 		exit(1);
@@ -99,10 +98,10 @@ int main(int argc, char *argv[]){
 
 	if (rv == -1) {
 		perror("select"); // error occurred in select()
-	} 
+	}
 	else if (rv == 0) {
 		printf("Timeout occurred! No data after 10.5 seconds.\n");
-	} 
+	}
 	else{
 		if (FD_ISSET(sockfd, &readfds)){
 			if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
@@ -126,10 +125,10 @@ int main(int argc, char *argv[]){
 
 	if (rv == -1) {
 		perror("select"); // error occurred in select()
-	} 
+	}
 	else if (rv == 0) {
 		printf("Timeout occurred! No data after 10.5 seconds.\n");
-	} 
+	}
 	else{
 		if (FD_ISSET(sockfd, &readfds)){
 			if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
@@ -140,7 +139,7 @@ int main(int argc, char *argv[]){
 	}
 
 
-	
+
 
 	buf[numbytes] = '\0';
 	strcpy(nome_img,nome);
@@ -159,10 +158,8 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 	buf[numbytes] = '\0';
-	//printf("%s\n", buf);
 
 	int num = atoi(buf);
-	printf("num = %d\n", num);
 
 	memset(buf,0,strlen(buf));
 
@@ -170,10 +167,10 @@ int main(int argc, char *argv[]){
 
 	if (rv == -1) {
 		perror("select"); // error occurred in select()
-	} 
+	}
 	else if (rv == 0) {
 		printf("Timeout occurred! No data after 10.5 seconds.\n");
-	} 
+	}
 	else{
 		if (FD_ISSET(sockfd, &readfds)){
 			if ((numbytes = recvfrom(sockfd, buf,num , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) {
@@ -183,10 +180,8 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-
-	
 	int i = 0;
-		
+
 	strcat(nome_img,".jpeg");
 	arqI = fopen(nome_img,"wb"); //WRITES a file to save the image sent from the server
 	//buf[numbytes] = '\0';
@@ -197,11 +192,7 @@ int main(int argc, char *argv[]){
 	}
 
 	fclose(arqI);
-	
-	printf("tamanho da imagem = %d\n", i);
-	
-	printf("tamanho do arquivo de imagem = %d\n", fileb_size(arqI,nome_img));
-	//printf("%s\n",buf); // PRINTS in the client screen
+
 	memset(buf,0,strlen(buf));
 
 	freeaddrinfo(servinfo);

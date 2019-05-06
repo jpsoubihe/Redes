@@ -172,13 +172,6 @@ int main(void){
 			i++;
 		}
 
-
-
-		printf("tamanho da imagem = %d\n", i);
-		printf("tamanho da imagem = %ld\n", strlen(buf));
-
-
-
 		if ((numbytes = sendto(sockfd, buf,tam_img, 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
 			perror("listener: sendto");
 			exit(1);

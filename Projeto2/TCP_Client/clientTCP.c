@@ -152,7 +152,6 @@ int main(int argc, char *argv[]){
 
       buf[numbytes] = '\0';
       int num = atoi(buf);
-      printf("num = %d\n", num);
       memset(buf,0,num);
 
       if ((numbytes = recv(sockfd, buf, num, 0)) == -1) { //RECEIVES image
@@ -169,7 +168,6 @@ int main(int argc, char *argv[]){
     		fprintf(arqI,"%c",buf[i]);
     		i++;
     	}
-      printf("tamanho da imagem = %d\n", i);
       rewind(arqI);
     	fclose(arqI);
 

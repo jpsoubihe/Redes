@@ -198,8 +198,6 @@ int main(void){
 		    while(loop == 1){
 		      inteiro = read(new_fd, &received_int, sizeof(received_int)); //RECEIVES operation identifier
 
-		      fprintf(stdout,"%d\n", ntohl(received_int));
-
 	          inteiro = ntohl(received_int);
 
 	          if(inteiro == 0){ //EXIT
@@ -223,8 +221,6 @@ int main(void){
                tam_img = fileb_size(f_info); //tamanho real do arquivo jpeg
 
                sprintf(img,"%d",tam_img); //guarda em buf uma string com o tamanho da imagem
-
-            	 printf("tamanho imagem = %s\n", img);
 
              	 if (send(new_fd, img, strlen(img), 0) == -1) // SEND size of image
               	perror("send");
