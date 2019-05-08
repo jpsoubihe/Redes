@@ -12,10 +12,14 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/select.h>
+#include <sys/time.h>
+
 
 
 #define SERVERPORT "4950" // the port users will be connecting to
 #define MAXBUFLEN 100000
+
+struct timeval tv1,tv2;
 
 
 int fileb_size(FILE *a,char *nome){
@@ -82,6 +86,8 @@ int main(int argc, char *argv[]){
 	}
 
 	strcpy(nome,argv[2]);
+        
+        gettimeofday(&tv1,NULL);
   
 	if ((numbytes = sendto(sockfd, argv[2], strlen(argv[2]), 0,p->ai_addr, p->ai_addrlen)) == -1) {
 		perror("talker: sendto");
@@ -179,7 +185,9 @@ int main(int argc, char *argv[]){
 			}
 		}
 	}
-
+        
+        gettimeofday(&tv2,NULL);
+        
 	int i = 0;
 
 	strcat(nome_img,".jpeg");
@@ -198,5 +206,8 @@ int main(int argc, char *argv[]){
 	freeaddrinfo(servinfo);
 
 	close(sockfd);
+        
+        double tempo = (tv2.tv_sec - tv1.tv_sec) + ((tv2.tv_usec - tv1.tv_usec)/1000000.0);
+        printf("Tempo de atualização no cliente: %lfs\n", tempo);
 	return 0;
 }

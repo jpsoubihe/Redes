@@ -112,8 +112,10 @@ int main(int argc, char *argv[]){
     printf("%s\n",menu);
     scanf("%d", &op); //OP is the flag for the next operation
     converted_number = htonl(op); //PREPARES the integer to be sent through the socket
-    write(sockfd, &converted_number, sizeof(converted_number)); //SENDS the operation integer to the server
+    
     gettimeofday(&tv1,NULL); //captures the initial time of the requisition
+    
+    write(sockfd, &converted_number, sizeof(converted_number)); //SENDS the operation integer to the server
 
     if(op == 0){ //SHUT DOWN the connection
       loop--;
@@ -123,14 +125,14 @@ int main(int argc, char *argv[]){
 
     if(op == 1){
 
-      gettimeofday(&tv1,NULL);
+      //gettimeofday(&tv1,NULL);
 
       if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) { //RECEIVES data
         perror("recv");
         exit(1);
       }
 
-      gettimeofday(&tv2,NULL);
+      
 
       strcpy(nome_aux,nome);
       strcat(nome_aux,".txt");
@@ -158,6 +160,8 @@ int main(int argc, char *argv[]){
         perror("recv");
         exit(1);
       }
+      
+      gettimeofday(&tv2,NULL);
 
       i = 0;
 
@@ -176,7 +180,7 @@ int main(int argc, char *argv[]){
     }
 
     double tempo = (tv2.tv_sec - tv1.tv_sec) + ((tv2.tv_usec - tv1.tv_usec)/1000000.0);
-    printf("Tempo de consulta: %lf\n", tempo);
+    printf("Tempo de consulta no cliente: %lf\n", tempo);
   }
   close(sockfd);
   return 0;

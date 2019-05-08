@@ -16,12 +16,17 @@ Primitiva select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,str
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include "arq.h"
+#include "arqUDP.h"
+#include <sys/time.h>
+
 
 #define MYPORT "4950"
 
 // the port users will be connecting to
 #define MAXBUFLEN 100000
+
+
+struct timeval tv1,tv2;
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa){
@@ -101,6 +106,8 @@ int main(void){
 			perror("recvfrom");
 			exit(1);
 		}
+		
+		gettimeofday(&tv1,NULL);
 
 		printf("listener: got packet from %s\n",
 		inet_ntop(their_addr.ss_family,get_in_addr((struct sockaddr *)&their_addr),s, sizeof s));
@@ -152,7 +159,6 @@ int main(void){
 			exit(1);
 		}
 
-			//FALTA IMPLEMENTAR SEND DA IMAGEM!!!!!!!!!!!!!!!!!!!!!
 		f_info = &file_array[flag + 1];
 		tam_img = fileb_size(f_info);
 
@@ -171,16 +177,24 @@ int main(void){
 			buf[i] = fgetc(a);
 			i++;
 		}
-
+                
+                gettimeofday(&tv2,NULL);
+                
 		if ((numbytes = sendto(sockfd, buf,tam_img, 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
 			perror("listener: sendto");
 			exit(1);
 		}
+		
+		double tempo = (tv2.tv_sec - tv1.tv_sec) + ((tv2.tv_usec - tv1.tv_usec)/1000000.0);
+                printf("Tempo de atualização no server: %lfs\n", tempo);
 	}
 
 
 
 
 	close(sockfd);
+        
+        
+                   
 	return 0;
 }

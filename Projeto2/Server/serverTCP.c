@@ -196,7 +196,8 @@ int main(void){
 		    int loop = 1;
 
 		    while(loop == 1){
-		      inteiro = read(new_fd, &received_int, sizeof(received_int)); //RECEIVES operation identifier
+		      inteiro = read(new_fd, &received_int,sizeof(received_int)); //RECEIVES operation identifier
+                      gettimeofday(&tv1,NULL);
 
 	          inteiro = ntohl(received_int);
 
@@ -204,23 +205,23 @@ int main(void){
 	          	printf("Encerrando processo...\n");
 				loop--;
 		        close(new_fd);
+                        gettimeofday(&tv2,NULL);
 		        exit(0);
 	          }
 
-		       else if(inteiro == 1){ // List all people of a specific academic formation
+		       else if(inteiro == 1){ // Envia o nome e Sobrenome
 	             getNome(f_info,nome);
 	             len = strlen(nome);
 
-	             if (sendall(new_fd,nome,&len) == -1) // SENDS menu
+	             if (sendall(new_fd,nome,&len) == -1) // SENDS txt
           			perror("send");
 
 	             memset(nome,0,len);
-	                   //FALTA IMAGEM!!!!!!!!!!!!!!!!!
-
+                     
 	             f_info = &file_array[flag + 1]; //f_info aponta para a imagem respectiva ao perfil
                tam_img = fileb_size(f_info); //tamanho real do arquivo jpeg
 
-               sprintf(img,"%d",tam_img); //guarda em buf uma string com o tamanho da imagem
+               sprintf(img,"%d",tam_img); //guarda em img uma string com o tamanho da imagem
 
              	 if (send(new_fd, img, strlen(img), 0) == -1) // SEND size of image
               	perror("send");
@@ -236,7 +237,7 @@ int main(void){
 
               rewind(a);
               fclose(a);
-
+              gettimeofday(&tv2,NULL);
               if (send(new_fd, buf, i, 0) == -1) // SEND image
                perror("send");
 
@@ -250,7 +251,7 @@ int main(void){
 	             exit(0);
 	           }
 	           double tempo = (tv2.tv_sec - tv1.tv_sec) + ((tv2.tv_usec - tv1.tv_usec)/1000000.0);
-	           printf("Tempo de atualização: %lfs\n", tempo);
+	           printf("Tempo de atualização no server: %lfs\n", tempo);
 		    }
 	      close(new_fd);
 	      exit(0);
