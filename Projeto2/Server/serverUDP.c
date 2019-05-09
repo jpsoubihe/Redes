@@ -1,10 +1,6 @@
 /*
 ** listener.c -- a datagram sockets "server" demo
 */
-// CHECAR ESSE SITE https://devarea.com/linux-io-multiplexing-select-vs-poll-vs-epoll/#.XMr94sZ7mV4
-// Arrumar select();
-/*Pensar no caso do cliente mandar a requisição, o servidor receber, mas a resposta se perder no caminho ao cliente
-Primitiva select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,struct timeval *timeout); - tem no beej*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,10 +17,10 @@ Primitiva select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,str
 
 
 #define MYPORT "4950"
-
 // the port users will be connecting to
-#define MAXBUFLEN 100000
 
+#define MAXBUFLEN 100000
+//tamanho máximo do buffer
 
 struct timeval tv1,tv2;
 
@@ -118,18 +114,19 @@ int main(void){
 		printf("listener: packet contains \"%s\"\n", buf);
 
 		strcat(buf,".txt");
-	  buf[numbytes + 4] = '\0';
-	  printf("login de %s\n", buf);
+	  	buf[numbytes + 4] = '\0';
+	  	printf("login de %s\n", buf);
 
-	  int flag = -1;
-	  for (i = 0; i < sizeof(file_array) / sizeof(FileInfo); i += 2){ //CHECKS Login
-	  	if(compare(file_array[i].filename,buf) == 1){
-	  		f_info = &file_array[i];
-	  		flag = i;
+	  	int flag = -1;
+	  	
+	  	for (i = 0; i < sizeof(file_array) / sizeof(FileInfo); i += 2){ //CHECKS Login
+	  		if(compare(file_array[i].filename,buf) == 1){
+	  			f_info = &file_array[i];
+	  			flag = i;
+	  		}
 	  	}
-	  }
 
-	  if(flag == -1){//Case wrong login
+	  	if(flag == -1){//Case wrong login
 			strcpy(buf,"Wrong");
 
 			if ((numbytes = sendto(sockfd, buf, strlen(buf), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
@@ -138,12 +135,11 @@ int main(void){
 			}
 
 			exit(1);
-	   	free(f_info);
-	   	close(sockfd);
+		   	free(f_info);
+		   	close(sockfd);
 		}
 
 		strcpy(buf,"Bem Vindo!!");
-
 
 		if ((numbytes = sendto(sockfd, buf, strlen(buf), 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
 			perror("listener: sendto");
@@ -172,13 +168,15 @@ int main(void){
 		}
 
 		a = fopen(f_info->filename,"rb");
+		
 		int i = 0;
+		
 		while(i < tam_img){
 			buf[i] = fgetc(a);
 			i++;
 		}
                 
-                gettimeofday(&tv2,NULL);
+        gettimeofday(&tv2,NULL);
                 
 		if ((numbytes = sendto(sockfd, buf,tam_img, 0,(struct sockaddr *)&their_addr,addr_len)) == -1) {
 			perror("listener: sendto");
@@ -186,15 +184,15 @@ int main(void){
 		}
 		
 		double tempo = (tv2.tv_sec - tv1.tv_sec) + ((tv2.tv_usec - tv1.tv_usec)/1000000.0);
-                printf("Tempo de atualização no server: %lfs\n", tempo);
+        printf("Tempo de atualização no server: %lfs\n", tempo);
 	}
 
 
 
 
-	close(sockfd);
+close(sockfd);
         
         
                    
-	return 0;
+return 0;
 }
