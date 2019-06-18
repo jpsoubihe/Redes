@@ -1,6 +1,8 @@
 package RMI_Client;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
@@ -24,6 +26,7 @@ public class Client implements Serializable{
         	System.out.println("Olá! Digite seu email: ");
             Scanner sc = new Scanner(System.in);
             String login = sc.next();
+            BufferedWriter writer;
 
             Registry registry = LocateRegistry.getRegistry(host);
             Compute stub = (Compute) registry.lookup("Compute");
@@ -49,21 +52,31 @@ public class Client implements Serializable{
             		System.out.println("Digite a formação acadêmica a ser pesquisada:");  
             		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
                 	String input = reader.readLine();
+                	writer = new BufferedWriter(new FileWriter("GraduatedIn" + input));
             		ArrayList<String> nomes = stub.getGraduation(input);
                 	System.out.println("Perfis que possuem a formação desejada:");
-            		for(int i = 0;i < nomes.size();i++)
+            		for(int i = 0;i < nomes.size();i++) {
             			System.out.println(nomes.get(i));
+            			writer.write(nomes.get(i)+'\n');
+            		}
+            		
+            		writer.close();
+            			
             	}
                 else if(func == 2) {// printing name + surname + habilities of those who lives in the city searched
                 	System.out.println("Digite a cidade a ser pesquisada:"); 
                 	BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
                 	String input = reader.readLine();
+                	writer = new BufferedWriter(new FileWriter("Habilities" + input));
             		ArrayList<String> habilities = stub.getHabilities(input);
                 	for(int j = 0;j < habilities.size(); j++) {
-                		System.out.println("Nome: " + habilities.get(j++));
-                		System.out.println("Habilidades: " + habilities.get(j));	
+                		System.out.println("Nome: " + habilities.get(j));
+                		writer.write("Nome: " + habilities.get(j++) + '\n');
+                		System.out.println("Habilidades: " + habilities.get(j));
+                		writer.write("Habilidades: " + habilities.get(j) + '\n');
                 	}
-    				            	}
+                	writer.close();
+    			}
                 else if(func == 3) {
                 	System.out.println(response + "Tarefa 3");
     			}
@@ -71,30 +84,46 @@ public class Client implements Serializable{
                 	System.out.println("Digite o email do perfil buscado:");
                 	ArrayList<String> xp;
                 	xp = stub.experiences(sc.next());
+                	writer = new BufferedWriter(new FileWriter("ExpSearch"));
                 	System.out.println("Experiências:");
                 	for(int j = 1;j <= xp.size();j++) {
                 		System.out.println("("+ j +") " + xp.get(j - 1));
+                		writer.write("("+ j +") " + xp.get(j - 1) + '\n');
                 	}
-                	
+                	writer.close();
     			}	
                 else if(func == 5) { //printing the profiles on the client Terminal
                 	ArrayList<Profile> p = stub.buildProf();
+                	writer = new BufferedWriter(new FileWriter("LogPerfis"));
                     for(int i = 0;i < p.size();i++) {
                     	System.out.println("Email: " + p.get(i).getEmail());
+                    	writer.write("Email: " + p.get(i).getEmail() + '\n');
                     	System.out.println("Nome: " + p.get(i).getName() + " Sobrenome: " + p.get(i).getSurname());
+                    	writer.write("Nome: " + p.get(i).getName() + " Sobrenome: " + p.get(i).getSurname() + '\n');
                     	System.out.println("Residência: " + p.get(i).getRes());
+                    	writer.write("Residência: " + p.get(i).getRes() + '\n');
                     	System.out.println("Formação Acadêmica: " + p.get(i).getGrad());
+                    	writer.write("Formação Acadêmica: " + p.get(i).getGrad() + '\n');
                     	System.out.println("Habilidades: " + p.get(i).getHab());
+                    	writer.write("Habilidades: " + p.get(i).getHab() + '\n');
                     	System.out.print("Experiências: ");
+                    	writer.write("Experiências: ");
                     	for(int j = 1;j <= p.get(i).getExperience().size();j++) {
                     		System.out.println("("+ j +") " + p.get(i).getExperience().get(j-1));
+                    		writer.write("("+ j +") " + p.get(i).getExperience().get(j-1) + '\n');
                     	}
+                    	writer.write('\n');
                     	System.out.println();
                     }
+                    writer.close();
     			}	
                 else if(func == 6) { //printing the respective profile on the client Terminal
-                	System.out.println("Digite o email do perfil buscado:");  	
-                	System.out.println(stub.returnProfile(sc.next()));
+                	writer = new BufferedWriter(new FileWriter("ProfileSearch"));
+                	System.out.println("Digite o email do perfil buscado:");
+                	String r = stub.returnProfile(sc.next());
+                	System.out.println(r);
+                	writer.write(r + '\n');
+                	writer.close();
     			}
                 else {
                 	System.out.println(response + "Não há essa funcionalidade, tente outra vez!");
