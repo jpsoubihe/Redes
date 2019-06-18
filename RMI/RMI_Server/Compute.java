@@ -15,4 +15,5 @@ public interface Compute extends Remote {
     ArrayList<String> getHabilities(String residence) throws RemoteException,FileNotFoundException;
     String returnProfile(String email)  throws RemoteException, FileNotFoundException;
     ArrayList<String> experiences(String email) throws RemoteException, FileNotFoundException;
+    boolean addXP(String xp,String email) throws RemoteException, FileNotFoundException;
 }

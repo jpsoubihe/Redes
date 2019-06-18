@@ -27,6 +27,7 @@ public class Client implements Serializable{
             Scanner sc = new Scanner(System.in);
             String login = sc.next();
             BufferedWriter writer;
+            BufferedReader reader;
 
             Registry registry = LocateRegistry.getRegistry(host);
             Compute stub = (Compute) registry.lookup("Compute");
@@ -50,7 +51,7 @@ public class Client implements Serializable{
             while(func != 0) {
             	if(func == 1) { // printing name + surname of those who has the formation searched on the client Terminal
             		System.out.println("Digite a formação acadêmica a ser pesquisada:");  
-            		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            		reader = new BufferedReader(new InputStreamReader(System.in));
                 	String input = reader.readLine();
                 	writer = new BufferedWriter(new FileWriter("GraduatedIn" + input));
             		ArrayList<String> nomes = stub.getGraduation(input);
@@ -65,7 +66,7 @@ public class Client implements Serializable{
             	}
                 else if(func == 2) {// printing name + surname + habilities of those who lives in the city searched
                 	System.out.println("Digite a cidade a ser pesquisada:"); 
-                	BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+                	reader = new BufferedReader(new InputStreamReader(System.in));
                 	String input = reader.readLine();
                 	writer = new BufferedWriter(new FileWriter("Habilities" + input));
             		ArrayList<String> habilities = stub.getHabilities(input);
@@ -78,7 +79,10 @@ public class Client implements Serializable{
                 	writer.close();
     			}
                 else if(func == 3) {
-                	System.out.println(response + "Tarefa 3");
+            		System.out.println("Digite sua nova experiência:");
+            		stub.addXP(new BufferedReader(new InputStreamReader(System.in)),login);
+
+                	
     			}
                 else if(func == 4) { //printing the experiences of the current profile on the client Terminal
                 	System.out.println("Digite o email do perfil buscado:");

@@ -24,6 +24,19 @@ public class Server implements Compute, Serializable {
         return "Hello, world!";
     }
     
+    boolean addXP(String xp,String email) throws FileNotFoundException{
+    	File a = new File(email);
+    	int count = 0;
+    	Scanner leitor = new Scanner(prof_file);
+    	while(sc.hasNextLine()) {
+    		sc.nextLine();
+    		count++;
+    	}
+    	sc.nextLine();
+    	count++;
+    	//write in file a exp count - 5 + 1
+    }
+    
     public ArrayList<Profile> buildProf() throws FileNotFoundException{
     	ArrayList<Profile> profs = new ArrayList<Profile>();
     	for(int i = 0;i < arquivos.length;i++)
