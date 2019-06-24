@@ -3,6 +3,9 @@ package RMI_Server;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -24,26 +27,28 @@ public class Server implements Compute, Serializable {
         return "Hello, world!";
     }
     
-    boolean addXP(String xp,String email) throws FileNotFoundException{
+     public boolean addXP(String xp,String email) throws IOException{
     	File a = new File(email);
     	int count = 0;
-    	Scanner leitor = new Scanner(prof_file);
-    	while(sc.hasNextLine()) {
-    		sc.nextLine();
+    	Scanner leitor = new Scanner(a);
+    	while(leitor.hasNextLine()) {
+    		leitor.nextLine();
     		count++;
     	}
-    	sc.nextLine();
     	count++;
-    	//write in file a exp count - 5 + 1
+    	leitor.close();
+    	String experience = "(" + (count - 5) + ") "+ xp + "\n";
+    	FileWriter writer = new FileWriter(email,true);
+    	writer.write(experience);
+    	writer.close();
+		return true;
+
     }
     
     public ArrayList<Profile> buildProf() throws FileNotFoundException{
     	ArrayList<Profile> profs = new ArrayList<Profile>();
     	for(int i = 0;i < arquivos.length;i++)
     		profs.add(new Profile(new File(arquivos[i])));
-//    	p = new Profile(a);
-//    	System.out.println(p.toString());
-//		return p;
 		return profs;
     }
     

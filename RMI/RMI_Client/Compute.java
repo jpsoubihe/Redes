@@ -1,4 +1,4 @@
-package RMI_Server;
+package RMI_Client;
 
 
 import java.io.FileNotFoundException;

@@ -11,9 +11,6 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import RMI_Server.Compute;
-import RMI_Server.Profile;
-
 public class Client implements Serializable{
 
     private Client() {}
@@ -23,7 +20,9 @@ public class Client implements Serializable{
         String host = (args.length < 1) ? null : args[0];
         //File a = new File("ana@gmail.com");
         try {
-        	System.out.println("Olá! Digite seu email: ");
+
+	    System.setSecurityManager(new RMISecurityManager());
+            System.out.println("Olá! Digite seu email: ");
             Scanner sc = new Scanner(System.in);
             String login = sc.next();
             BufferedWriter writer;
@@ -54,7 +53,12 @@ public class Client implements Serializable{
             		reader = new BufferedReader(new InputStreamReader(System.in));
                 	String input = reader.readLine();
                 	writer = new BufferedWriter(new FileWriter("GraduatedIn" + input));
+                	System.out.print("Current Time in milliseconds = ");
+                	long t1 = System.currentTimeMillis();
             		ArrayList<String> nomes = stub.getGraduation(input);
+            		long t2 = System.currentTimeMillis();
+            		long time = t2 - t1;
+                	System.out.println(time);
                 	System.out.println("Perfis que possuem a formação desejada:");
             		for(int i = 0;i < nomes.size();i++) {
             			System.out.println(nomes.get(i));
@@ -78,10 +82,12 @@ public class Client implements Serializable{
                 	}
                 	writer.close();
     			}
-                else if(func == 3) {
+                else if(func == 3) { //writing on file and confirming
             		System.out.println("Digite sua nova experiência:");
-            		stub.addXP(new BufferedReader(new InputStreamReader(System.in)),login);
-
+                    BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+                    String buffer = buf.readLine();
+            		System.out.println("Experiência Adicionada!!");
+                    stub.addXP(buffer,login);
                 	
     			}
                 else if(func == 4) { //printing the experiences of the current profile on the client Terminal
