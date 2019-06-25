@@ -102,8 +102,9 @@ public class Client implements Serializable{
                 else if(func == 4) { //printing the experiences of the current profile on the client Terminal
                 	System.out.println("Digite o email do perfil buscado:");
                 	ArrayList<String> xp;
+                	String s = sc.next();
                 	t1 = System.currentTimeMillis();
-                	xp = stub.experiences(sc.next());
+                	xp = stub.experiences(s);
                 	t2 = System.currentTimeMillis();
             		time = t2 - t1;
                 	writer = new BufferedWriter(new FileWriter("ExpSearch"));
@@ -144,9 +145,11 @@ public class Client implements Serializable{
     			}	
                 else if(func == 6) { //printing the respective profile on the client Terminal
                 	writer = new BufferedWriter(new FileWriter("ProfileSearch"));
+                	
                 	System.out.println("Digite o email do perfil buscado:");
+                	String s = sc.next();
                 	t1 = System.currentTimeMillis();
-                	String r = stub.returnProfile(sc.next());
+                	String r = stub.returnProfile(s);
                 	t2 = System.currentTimeMillis();
             		time = t2 - t1;
                 	System.out.println(r);

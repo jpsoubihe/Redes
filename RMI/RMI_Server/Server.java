@@ -18,7 +18,9 @@ import java.util.Scanner;
 
 public class Server implements Compute, Serializable {
 	String[] arquivos = {"julia@gmail.com","ana@gmail.com","jpsoubihe@gmail.com","ze@gmail.com","maria_silva@gmail.com"}; //we can turn this into an arraylist?
-    	
+	long t1;
+	long t2;
+	long time = 0;	
     	
     public Server() {
     }
@@ -28,32 +30,40 @@ public class Server implements Compute, Serializable {
     }
     
      public boolean addXP(String xp,String email) throws IOException{
-	//email = "../" + email;    	
-	File a = new File(email);
-    	int count = 0;
-    	Scanner leitor = new Scanner(a);
-    	while(leitor.hasNextLine()) {
-    		leitor.nextLine();
-    		count++;
-    	}
-    	count++;
-    	leitor.close();
-    	String experience = "(" + (count - 5) + ") "+ xp + "\n";
-    	FileWriter writer = new FileWriter(email,true);
-    	writer.write(experience);
-    	writer.close();
-		return true;
+    	 t1 = System.currentTimeMillis();
+    	 File a = new File(email);
+    	 int count = 0;
+    	 Scanner leitor = new Scanner(a);
+    	 while(leitor.hasNextLine()) {
+    		 leitor.nextLine();
+    		 count++;
+    	 }
+    	 count++;
+    	 leitor.close();
+    	 String experience = "(" + (count - 5) + ") "+ xp + "\n";
+    	 FileWriter writer = new FileWriter(email,true);
+    	 writer.write(experience);
+    	 writer.close();
+    	 t2 = System.currentTimeMillis();
+    	 time = t2 - t1;
+    	 System.out.println("Current Time in milliseconds = " + time);
+    	 return true;
 
-    }
+     }
     
     public ArrayList<Profile> buildProf() throws FileNotFoundException{
+    	t1 = System.currentTimeMillis();
     	ArrayList<Profile> profs = new ArrayList<Profile>();
     	for(int i = 0;i < arquivos.length;i++)
     		profs.add(new Profile(new File(arquivos[i])));
-		return profs;
+    	t2 = System.currentTimeMillis();
+    	time = t2 - t1;
+    	System.out.println("Current Time in milliseconds = " + time);
+    	return profs;
     }
     
     public ArrayList<String> getHabilities(String residence) throws FileNotFoundException{
+    	t1 = System.currentTimeMillis();
     	ArrayList<Profile> profiles = this.buildProf();
     	ArrayList<String> habilidades = new ArrayList<String>();
     	for(int i = 0;i < profiles.size();i++) {
@@ -62,10 +72,14 @@ public class Server implements Compute, Serializable {
     			habilidades.add(profiles.get(i).getHab());
     		}
     	}
+    	t2 = System.currentTimeMillis();
+    	time = t2 - t1;
+    	System.out.println("Current Time in milliseconds = " + time);
     	return habilidades;
     }
     
     public ArrayList<String> getGraduation(String grad) throws FileNotFoundException { 
+    	t1 = System.currentTimeMillis();
     	ArrayList<Profile> profiles = this.buildProf();
     	ArrayList<String> nomes = new ArrayList<String>();
     	for(int i = 0;i < profiles.size();i++) {	
@@ -74,30 +88,42 @@ public class Server implements Compute, Serializable {
     			nomes.add(profiles.get(i).getName() + " " + profiles.get(i).getSurname());
     		}	
     	}
+    	t2 = System.currentTimeMillis();
+    	time = t2 - t1;
+    	System.out.println("Current Time in milliseconds = " + time);
     	return nomes;
     }
     
      public String returnProfile(String email) throws FileNotFoundException {
-	//email = "../" + email;    	
-	File prof_file = new File(email);
-    	Scanner leitor = new Scanner(prof_file);
-    	String perfil;
-    	perfil = leitor.nextLine();
-    	while(leitor.hasNextLine()) {
-    		perfil += '\n' + leitor.nextLine();
-    	}
-    	leitor.close();
-    	return perfil;
-    }
+    	 t1 = System.currentTimeMillis();
+    	 File prof_file = new File(email);
+    	 Scanner leitor = new Scanner(prof_file);
+    	 String perfil;
+    	 perfil = leitor.nextLine();
+    	 while(leitor.hasNextLine()) {
+    		 perfil += '\n' + leitor.nextLine();
+    	 }
+    	 leitor.close();
+    	 t2 = System.currentTimeMillis();
+    	 time = t2 - t1;
+    	 System.out.println("Current Time in milliseconds = " + time);
+    	 return perfil;
+     }
     
     public boolean checkLogin(String login) throws RemoteException{
-	//		login = "/RMI_Server/" + login;
+    	t1 = System.currentTimeMillis();
     	for(int i = 0;i < arquivos.length;i++) {
     		if(login.equals(arquivos[i])){
-			return true;
-		}
+    			t2 = System.currentTimeMillis();
+    	    	time = t2 - t1;
+    	    	System.out.println("Current Time in milliseconds = " + time);
+    	    	return true;
+    		}
     			
     	}
+    	t2 = System.currentTimeMillis();
+    	time = t2 - t1;
+    	System.out.println("Current Time in milliseconds = " + time);
     	return false;
     }
     
@@ -116,8 +142,8 @@ public class Server implements Compute, Serializable {
     }
     
     public ArrayList<String> experiences(String email) throws FileNotFoundException{
+    	t1 = System.currentTimeMillis();
     	int i;
-    	//email = "../" + email;
     	Scanner leitor = new Scanner(new File(email));
     	for(i = 0;i < 5;i++)
     		leitor.nextLine();
@@ -129,6 +155,9 @@ public class Server implements Compute, Serializable {
 			experience.add(leitor.nextLine());
 		}	
 		leitor.close();
+		t2 = System.currentTimeMillis();
+		time = t2 - t1;
+		System.out.println("Current Time in milliseconds = " + time);
     	return experience;
     }
     public static void main(String args[]) {
