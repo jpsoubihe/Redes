@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import RMI_Server.Compute;
+import RMI_Server.Profile;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.rmi.registry.LocateRegistry;
@@ -11,20 +13,22 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+
 public class Client implements Serializable{
 
     private Client() {}
 
     public static void main(String[] args) {
-
-        String host = (args.length < 1) ? null : args[0];
+    	long t1;
+    	long t2;
+    	long time = 0;
+        String host = args[0];
         //File a = new File("ana@gmail.com");
-        try {
-
-	    System.setSecurityManager(new RMISecurityManager());
+        try {  	
             System.out.println("Olá! Digite seu email: ");
             Scanner sc = new Scanner(System.in);
             String login = sc.next();
+            //login = "../" + login;
             BufferedWriter writer;
             BufferedReader reader;
 
@@ -53,12 +57,10 @@ public class Client implements Serializable{
             		reader = new BufferedReader(new InputStreamReader(System.in));
                 	String input = reader.readLine();
                 	writer = new BufferedWriter(new FileWriter("GraduatedIn" + input));
-                	System.out.print("Current Time in milliseconds = ");
-                	long t1 = System.currentTimeMillis();
+                	t1 = System.currentTimeMillis();
             		ArrayList<String> nomes = stub.getGraduation(input);
-            		long t2 = System.currentTimeMillis();
-            		long time = t2 - t1;
-                	System.out.println(time);
+            		t2 = System.currentTimeMillis();
+            		time = t2 - t1;
                 	System.out.println("Perfis que possuem a formação desejada:");
             		for(int i = 0;i < nomes.size();i++) {
             			System.out.println(nomes.get(i));
@@ -73,7 +75,10 @@ public class Client implements Serializable{
                 	reader = new BufferedReader(new InputStreamReader(System.in));
                 	String input = reader.readLine();
                 	writer = new BufferedWriter(new FileWriter("Habilities" + input));
+                	t1 = System.currentTimeMillis();
             		ArrayList<String> habilities = stub.getHabilities(input);
+            		t2 = System.currentTimeMillis();
+            		time = t2 - t1;
                 	for(int j = 0;j < habilities.size(); j++) {
                 		System.out.println("Nome: " + habilities.get(j));
                 		writer.write("Nome: " + habilities.get(j++) + '\n');
@@ -86,14 +91,21 @@ public class Client implements Serializable{
             		System.out.println("Digite sua nova experiência:");
                     BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
                     String buffer = buf.readLine();
-            		System.out.println("Experiência Adicionada!!");
+                    t1 = System.currentTimeMillis();
                     stub.addXP(buffer,login);
+                    t2 = System.currentTimeMillis();
+            		time = t2 - t1;
+            		System.out.println("Experiência Adicionada!!");
+                    
                 	
     			}
                 else if(func == 4) { //printing the experiences of the current profile on the client Terminal
                 	System.out.println("Digite o email do perfil buscado:");
                 	ArrayList<String> xp;
+                	t1 = System.currentTimeMillis();
                 	xp = stub.experiences(sc.next());
+                	t2 = System.currentTimeMillis();
+            		time = t2 - t1;
                 	writer = new BufferedWriter(new FileWriter("ExpSearch"));
                 	System.out.println("Experiências:");
                 	for(int j = 1;j <= xp.size();j++) {
@@ -103,7 +115,10 @@ public class Client implements Serializable{
                 	writer.close();
     			}	
                 else if(func == 5) { //printing the profiles on the client Terminal
+                	t1 = System.currentTimeMillis();
                 	ArrayList<Profile> p = stub.buildProf();
+                	t2 = System.currentTimeMillis();
+            		time = t2 - t1;
                 	writer = new BufferedWriter(new FileWriter("LogPerfis"));
                     for(int i = 0;i < p.size();i++) {
                     	System.out.println("Email: " + p.get(i).getEmail());
@@ -130,7 +145,10 @@ public class Client implements Serializable{
                 else if(func == 6) { //printing the respective profile on the client Terminal
                 	writer = new BufferedWriter(new FileWriter("ProfileSearch"));
                 	System.out.println("Digite o email do perfil buscado:");
+                	t1 = System.currentTimeMillis();
                 	String r = stub.returnProfile(sc.next());
+                	t2 = System.currentTimeMillis();
+            		time = t2 - t1;
                 	System.out.println(r);
                 	writer.write(r + '\n');
                 	writer.close();
@@ -138,6 +156,9 @@ public class Client implements Serializable{
                 else {
                 	System.out.println(response + "Não há essa funcionalidade, tente outra vez!");
                 }
+            	
+            	System.out.print("Current Time in milliseconds = ");
+            	System.out.println(time);
             	
                 System.out.println();
                 System.out.println("(0) Sair;");

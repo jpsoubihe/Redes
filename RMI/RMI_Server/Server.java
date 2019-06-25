@@ -28,7 +28,8 @@ public class Server implements Compute, Serializable {
     }
     
      public boolean addXP(String xp,String email) throws IOException{
-    	File a = new File(email);
+	//email = "../" + email;    	
+	File a = new File(email);
     	int count = 0;
     	Scanner leitor = new Scanner(a);
     	while(leitor.hasNextLine()) {
@@ -77,7 +78,8 @@ public class Server implements Compute, Serializable {
     }
     
      public String returnProfile(String email) throws FileNotFoundException {
-    	File prof_file = new File(email);
+	//email = "../" + email;    	
+	File prof_file = new File(email);
     	Scanner leitor = new Scanner(prof_file);
     	String perfil;
     	perfil = leitor.nextLine();
@@ -89,9 +91,12 @@ public class Server implements Compute, Serializable {
     }
     
     public boolean checkLogin(String login) throws RemoteException{
+	//		login = "/RMI_Server/" + login;
     	for(int i = 0;i < arquivos.length;i++) {
-    		if(login.equals(arquivos[i]))
-    			return true;
+    		if(login.equals(arquivos[i])){
+			return true;
+		}
+    			
     	}
     	return false;
     }
@@ -112,6 +117,7 @@ public class Server implements Compute, Serializable {
     
     public ArrayList<String> experiences(String email) throws FileNotFoundException{
     	int i;
+    	//email = "../" + email;
     	Scanner leitor = new Scanner(new File(email));
     	for(i = 0;i < 5;i++)
     		leitor.nextLine();
