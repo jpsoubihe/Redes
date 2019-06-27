@@ -23,17 +23,15 @@ public class Client implements Serializable{
     	long t2;
     	long time = 0;
         String host = args[0];
-        //File a = new File("ana@gmail.com");
         try {  	
             System.out.println("Olá! Digite seu email: ");
             Scanner sc = new Scanner(System.in);
             String login = sc.next();
-            //login = "../" + login;
             BufferedWriter writer;
             BufferedReader reader;
 
-            Registry registry = LocateRegistry.getRegistry(host);
-            Compute stub = (Compute) registry.lookup("Compute");
+            Registry registry = LocateRegistry.getRegistry(host); //searchs the registry in the remote object
+            Compute stub = (Compute) registry.lookup("Compute"); //the stub of the comunication
             while(stub.checkLogin(login) == false) {
             	System.out.println("Login incorreto! Tente novamente: ");
             	login = sc.next();

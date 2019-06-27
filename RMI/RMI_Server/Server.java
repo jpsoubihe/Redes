@@ -29,7 +29,7 @@ public class Server implements Compute, Serializable {
         return "Hello, world!";
     }
     
-     public boolean addXP(String xp,String email) throws IOException{
+     public boolean addXP(String xp,String email) throws IOException{ // adds experience to a profile reconigzed by its email
     	 t1 = System.currentTimeMillis();
     	 File a = new File(email);
     	 int count = 0;
@@ -40,7 +40,7 @@ public class Server implements Compute, Serializable {
     	 }
     	 count++;
     	 leitor.close();
-    	 String experience = "(" + (count - 5) + ") "+ xp + "\n";
+    	 String experience = "(" + (count - 5) + ") "+ xp + "\n"; // calculates the number of the experience to be added
     	 FileWriter writer = new FileWriter(email,true);
     	 writer.write(experience);
     	 writer.close();
@@ -51,7 +51,7 @@ public class Server implements Compute, Serializable {
 
      }
     
-    public ArrayList<Profile> buildProf() throws FileNotFoundException{
+    public ArrayList<Profile> buildProf() throws FileNotFoundException{ //extracts the information of a profile from an archive
     	t1 = System.currentTimeMillis();
     	ArrayList<Profile> profs = new ArrayList<Profile>();
     	for(int i = 0;i < arquivos.length;i++)
@@ -62,12 +62,12 @@ public class Server implements Compute, Serializable {
     	return profs;
     }
     
-    public ArrayList<String> getHabilities(String residence) throws FileNotFoundException{
+    public ArrayList<String> getHabilities(String residence) throws FileNotFoundException{ // builds profiles and then checks the residence of each one
     	t1 = System.currentTimeMillis();
     	ArrayList<Profile> profiles = this.buildProf();
     	ArrayList<String> habilidades = new ArrayList<String>();
     	for(int i = 0;i < profiles.size();i++) {
-    		if(profiles.get(i).getRes().equals(residence)) {
+    		if(profiles.get(i).getRes().equals(residence)) { // if the residence checks with the one we're looking for we add its name (even indexes) and habilities (odd indexes) in the list
     			habilidades.add(profiles.get(i).getName() + " " + profiles.get(i).getSurname());
     			habilidades.add(profiles.get(i).getHab());
     		}
@@ -78,13 +78,12 @@ public class Server implements Compute, Serializable {
     	return habilidades;
     }
     
-    public ArrayList<String> getGraduation(String grad) throws FileNotFoundException { 
+    public ArrayList<String> getGraduation(String grad) throws FileNotFoundException { // builds profiles and then checks for the academics of each one
     	t1 = System.currentTimeMillis();
     	ArrayList<Profile> profiles = this.buildProf();
     	ArrayList<String> nomes = new ArrayList<String>();
     	for(int i = 0;i < profiles.size();i++) {	
-    		if(profiles.get(i).getGrad().equals(grad)) {
-    			//System.out.println("Entrou " + i + " count = " + count);
+    		if(profiles.get(i).getGrad().equals(grad)) {// if the graduation checks with the one we're looking for we add its name in the list
     			nomes.add(profiles.get(i).getName() + " " + profiles.get(i).getSurname());
     		}	
     	}
@@ -94,7 +93,7 @@ public class Server implements Compute, Serializable {
     	return nomes;
     }
     
-     public String returnProfile(String email) throws FileNotFoundException {
+     public String returnProfile(String email) throws FileNotFoundException { //looks for a specific profile in the array of archives on the server
     	 t1 = System.currentTimeMillis();
     	 File prof_file = new File(email);
     	 Scanner leitor = new Scanner(prof_file);
@@ -110,7 +109,7 @@ public class Server implements Compute, Serializable {
     	 return perfil;
      }
     
-    public boolean checkLogin(String login) throws RemoteException{
+    public boolean checkLogin(String login) throws RemoteException{ //validates the login
     	t1 = System.currentTimeMillis();
     	for(int i = 0;i < arquivos.length;i++) {
     		if(login.equals(arquivos[i])){
@@ -127,21 +126,7 @@ public class Server implements Compute, Serializable {
     	return false;
     }
     
-    public String profileGrad(String formation) throws FileNotFoundException {
-    	//String[] arquivos = {"julia@gmail.com","ana@gmail.com","jpsoubihe@gmail.com"};
-    	String res;
-    	Profile p;
-    	Scanner sc = null;
-    	for(String i: arquivos) {
-    		 sc = new Scanner(new File(i));
-    		
-    		
-    	}
-    	sc.close();
-    	return null;
-    }
-    
-    public ArrayList<String> experiences(String email) throws FileNotFoundException{
+    public ArrayList<String> experiences(String email) throws FileNotFoundException{ //returns the experiences of a profile recognized by its email
     	t1 = System.currentTimeMillis();
     	int i;
     	Scanner leitor = new Scanner(new File(email));
@@ -164,11 +149,11 @@ public class Server implements Compute, Serializable {
         
         try {
             Server obj = new Server();
-            Compute stub = (Compute) UnicastRemoteObject.exportObject(obj, 0);
+            Compute stub = (Compute) UnicastRemoteObject.exportObject(obj, 0); //registrate the server in the remote server of registries
 
             // Bind the remote object's stub in the registry
             Registry registry = LocateRegistry.getRegistry();
-            registry.bind("Compute", stub);
+            registry.bind("Compute", stub);//bind the stub with the interface Compute
 
             System.err.println("Server ready");
         } catch (Exception e) {
